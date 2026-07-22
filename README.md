@@ -239,6 +239,52 @@ Current topology:
 - 1 Control Plane
 - 2 Worker Nodes
 
+The first application deployed to the cluster is an NGINX web server used to validate the Kubernetes networking stack.
+
+## Deployed Resources
+
+- Kubernetes Deployment
+- Kubernetes ClusterIP Service
+- CoreDNS Service Discovery
+- Internal Pod-to-Service Communication
+
+## Deploy Application
+
+```bash
+kubectl apply -f kubernetes/apps/nginx/
+```
+
+## Verify Deployment
+
+```bash
+kubectl get deployments
+kubectl get pods -o wide
+kubectl get services
+kubectl get endpoints
+```
+
+## Validate DNS Resolution
+
+```bash
+kubectl run dns-test \
+  --image=busybox:1.36 \
+  --rm -it \
+  --restart=Never \
+  -- nslookup nginx-service.default.svc.cluster.local
+```
+
+## Validate Service Connectivity
+
+```bash
+kubectl run curl-test \
+  --image=curlimages/curl \
+  --rm -it \
+  --restart=Never \
+  -- curl http://nginx-service
+```
+
+A successful request returns the default NGINX welcome page.
+
 Deployment is fully automated and reproducible.
 
 ---
