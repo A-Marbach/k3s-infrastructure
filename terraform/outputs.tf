@@ -1,15 +1,26 @@
+output "server_names" {
+  description = "Names of all k3s nodes"
 
-output "control_plane_name" {
-  description = "Name des Control-Plane-Servers"
-  value       = hcloud_server.control_plane.name
+  value = {
+    for key, server in hcloud_server.nodes :
+    key => server.name
+  }
 }
 
-output "control_plane_ipv4" {
-  description = "Öffentliche IPv4-Adresse"
-  value       = hcloud_server.control_plane.ipv4_address
+output "server_ipv4_addresses" {
+  description = "Public IPv4 addresses of all k3s nodes"
+
+  value = {
+    for key, server in hcloud_server.nodes :
+    key => server.ipv4_address
+  }
 }
 
-output "control_plane_status" {
-  description = "Status des Servers"
-  value       = hcloud_server.control_plane.status
+output "server_status" {
+  description = "Status of all k3s nodes"
+
+  value = {
+    for key, server in hcloud_server.nodes :
+    key => server.status
+  }
 }
