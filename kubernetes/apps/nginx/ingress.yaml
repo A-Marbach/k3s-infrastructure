@@ -5,11 +5,19 @@ kind: Ingress
 metadata:
   name: nginx-ingress
 
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+
 spec:
   ingressClassName: traefik
 
+  tls:
+    - hosts:
+        - k3s.artur-marbach.de
+      secretName: nginx-tls
+
   rules:
-    - host: nginx.local
+    - host: k3s.artur-marbach.de
       http:
         paths:
           - path: /
