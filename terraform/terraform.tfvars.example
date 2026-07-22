@@ -1,0 +1,11 @@
+
+# Hetzner Cloud API Token
+hcloud_token = "YOUR_HCLOUD_API_TOKEN"
+
+# Name des SSH-Keys in deinem Hetzner Cloud Account
+ssh_key_name = "YOUR_SSH_KEY_NAME"
+
+# Server-Konfiguration
+server_type = "cx23"
+image       = "ubuntu-24.04"
+location    = "fsn1"
