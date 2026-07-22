@@ -270,6 +270,59 @@ After provisioning, Ansible configures every server automatically.
 
 ---
 
+# Automated Cluster Preparation
+
+To reduce manual work and make the infrastructure reproducible, the cluster preparation process was automated using Bash scripts.
+
+Previously, several steps had to be performed manually after every Terraform deployment:
+
+- Copy the new server IP addresses
+- Update the Ansible inventory
+- Remove outdated SSH host keys
+- Wait until the new servers were reachable
+- Connect as `root`
+- Create the administrator user
+- Switch Ansible to the administrator user
+- Run the main Ansible playbook
+- Download and update the kubeconfig
+- Verify the Kubernetes cluster
+
+These steps are now handled automatically.
+
+---
+
+## Automation Overview
+
+The automated workflow consists of several scripts:
+
+```text
+Terraform
+    │
+    ▼
+Create Hetzner Cloud servers
+    │
+    ▼
+generate-inventory.sh
+    │
+    ▼
+Create Ansible inventory from Terraform outputs
+    │
+    ▼
+prepare-cluster.sh
+    │
+    ├── Remove outdated SSH host keys
+    ├── Wait for SSH availability
+    ├── Test connection as administrator user
+    ├── Run bootstrap playbook if required
+    ├── Run the main Ansible playbook
+    └── Update local kubeconfig
+    │
+    ▼
+Ready k3s cluster
+
+---
+
+
 # Kubernetes
 
 The Kubernetes cluster is deployed entirely through Ansible.

@@ -1,0 +1,49 @@
+---
+- name: Configure all k3s nodes
+  hosts: k3s_cluster
+  become: true
+
+  roles:
+    - role: common
+      tags:
+        - common
+
+    - role: users
+      tags:
+        - users
+
+    - role: system_config
+      tags:
+        - system_config
+
+    - role: firewall
+      tags:
+        - firewall
+
+    - role: k3s_prerequisites
+      tags:
+        - k3s_prerequisites
+
+    - role: ssh_hardening
+      tags:
+        - ssh_hardening
+
+
+- name: Install k3s control plane
+  hosts: control_plane
+  become: true
+
+  roles:
+    - role: k3s_server
+      tags:
+        - k3s_server
+
+
+- name: Join worker nodes to the k3s cluster
+  hosts: workers
+  become: true
+
+  roles:
+    - role: k3s_agent
+      tags:
+        - k3s_agent
