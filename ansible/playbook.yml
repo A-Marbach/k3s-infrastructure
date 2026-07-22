@@ -1,4 +1,3 @@
-
 ---
 - name: Prepare all k3s nodes
   hosts: k3s_cluster
@@ -6,26 +5,45 @@
 
   roles:
     - role: common
-      tags: 
+      tags:
         - common
 
     - role: users
-      tags: 
+      tags:
         - users
 
-
     - role: ssh_hardening
-      tags: 
+      tags:
         - ssh_hardening
 
     - role: system_config
-      tags: 
+      tags:
         - system_config
 
     - role: firewall
-      tags: 
+      tags:
         - firewall
 
     - role: k3s_prerequisites
-      tags: 
+      tags:
         - k3s_prerequisites
+
+
+- name: Install k3s control plane
+  hosts: control_plane
+  become: true
+
+  roles:
+    - role: k3s_server
+      tags:
+        - k3s_server
+
+
+- name: Join worker nodes to the k3s cluster
+  hosts: workers
+  become: true
+
+  roles:
+    - role: k3s_agent
+      tags:
+        - k3s_agent
