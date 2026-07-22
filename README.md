@@ -1,6 +1,6 @@
 # k3s Infrastructure
 
-This repository contains a production-oriented Infrastructure as Code (IaC) project that provisions and configures a Kubernetes (k3s) cluster on Hetzner Cloud using Terraform and Ansible.
+This repository contains a production-oriented Infrastructure as Code (IaC) project that provisions and configures a highly available Kubernetes (k3s) cluster on Hetzner Cloud using Terraform and Ansible.
 
 The project demonstrates a complete infrastructure lifecycle:
 
@@ -8,10 +8,12 @@ The project demonstrates a complete infrastructure lifecycle:
 - Linux server configuration with Ansible
 - Kubernetes (k3s) cluster deployment
 - Infrastructure hardening
+- Traefik Ingress
+- Automatic TLS with cert-manager and Let's Encrypt
 - Infrastructure validation
 - Reproducible and scalable deployments
 
-The project will be extended with Ingress, cert-manager, monitoring, GitHub Actions, and automated application deployments.
+Future extensions include monitoring, CI/CD, and automated application deployments.
 
 ---
 
@@ -24,8 +26,11 @@ The project will be extended with Ingress, cert-manager, monitoring, GitHub Acti
 - Terraform
 - Ansible
 - Kubernetes
+- HTTPS & Ingress
 - Validation
+- Current Progress
 - Roadmap
+- Project Goals
 
 ---
 
@@ -71,6 +76,14 @@ ansible-playbook playbook.yml
 
 ---
 
+# Deploy Kubernetes Resources
+
+```bash
+kubectl apply -f kubernetes/apps/nginx/
+```
+
+---
+
 # Infrastructure Overview
 
 Current infrastructure:
@@ -83,29 +96,46 @@ Current infrastructure:
 - Terraform Provisioning
 - Ansible Configuration Management
 - Kubernetes (k3s)
+- Traefik Ingress Controller
+- cert-manager
+- Let's Encrypt TLS Certificates
+- HTTPS-enabled Applications
 
 ---
 
 # Architecture
 
 ```text
-                     Hetzner Cloud
-                           │
-                     Terraform IaC
-                           │
-                ┌──────────┴──────────┐
-                │                     │
-          Ubuntu Servers
-                │
-          Ansible Automation
-                │
-     ┌──────────┴──────────┐
-     │                     │
-k3s-control-plane
-     │
- ┌───┴─────────────┐
- │                 │
-worker-1       worker-2
+                      Internet
+                          │
+                          ▼
+             k3s.artur-marbach.de
+                          │
+                    DNS A Record
+                          │
+                          ▼
+            Traefik Ingress Controller
+                          │
+               HTTPS (Let's Encrypt)
+                          │
+                          ▼
+                 nginx-service (ClusterIP)
+                          │
+                ┌─────────┴─────────┐
+                │                   │
+          nginx Pod 1         nginx Pod 2
+
+
+                 Kubernetes Cluster
+                        ▲
+                        │
+               Ansible Configuration
+                        ▲
+                        │
+             Terraform Infrastructure
+                        ▲
+                        │
+                  Hetzner Cloud
 ```
 
 ---
@@ -136,6 +166,16 @@ k3s-infrastructure/
 │       ├── k3s_prerequisites/
 │       ├── k3s_server/
 │       └── k3s_agent/
+│
+├── kubernetes/
+│   ├── apps/
+│   │   └── nginx/
+│   │       ├── deployment.yaml
+│   │       ├── service.yaml
+│   │       └── ingress.yaml
+│   │
+│   └── cluster/
+│       └── cluster-issuer.yaml
 │
 ├── README.md
 └── .gitignore
@@ -206,7 +246,7 @@ After provisioning, Ansible configures every server automatically.
 - Allow HTTP
 - Allow HTTPS
 - Allow Kubernetes API
-- Configure Kubernetes network rules
+- Configure Kubernetes networking
 
 ### k3s_prerequisites
 
@@ -234,19 +274,20 @@ After provisioning, Ansible configures every server automatically.
 
 The Kubernetes cluster is deployed entirely through Ansible.
 
-Current topology:
+## Cluster Topology
 
 - 1 Control Plane
 - 2 Worker Nodes
 
-The first application deployed to the cluster is an NGINX web server used to validate the Kubernetes networking stack.
-
 ## Deployed Resources
 
 - Kubernetes Deployment
-- Kubernetes ClusterIP Service
+- ClusterIP Service
+- Traefik Ingress
+- cert-manager
+- Let's Encrypt Certificate
+- HTTPS-enabled Application
 - CoreDNS Service Discovery
-- Internal Pod-to-Service Communication
 
 ## Deploy Application
 
@@ -260,7 +301,7 @@ kubectl apply -f kubernetes/apps/nginx/
 kubectl get deployments
 kubectl get pods -o wide
 kubectl get services
-kubectl get endpoints
+kubectl get ingress
 ```
 
 ## Validate DNS Resolution
@@ -283,10 +324,73 @@ kubectl run curl-test \
   -- curl http://nginx-service
 ```
 
-A successful request returns the default NGINX welcome page.
+---
 
-Deployment is fully automated and reproducible.
+# HTTPS & Ingress
 
+Applications are exposed through Traefik Ingress using a public domain.
+
+Current configuration:
+
+- Domain-based routing
+- Traefik Ingress Controller
+- Automatic TLS provisioning
+- cert-manager
+- Let's Encrypt
+- HTTPS
+
+Example:
+
+```
+https://k3s.artur-marbach.de
+```
+
+The TLS certificate is automatically issued and renewed by cert-manager using Let's Encrypt.
+
+---
+
+# Monitoring
+
+Cluster monitoring is implemented using the official kube-prometheus-stack Helm chart.
+
+The monitoring stack provides real-time visibility into the Kubernetes cluster, worker nodes, and deployed workloads.
+
+## Components
+
+- Prometheus
+- Grafana
+- kube-state-metrics
+- Node Exporter
+
+## Collected Metrics
+
+Infrastructure metrics include:
+
+- CPU Usage
+- Memory Usage
+- Disk Usage
+- Network Traffic
+- Node Health
+
+Kubernetes metrics include:
+
+- Pod Status
+- Deployments
+- ReplicaSets
+- StatefulSets
+- DaemonSets
+- Container Restarts
+- Resource Requests & Limits
+
+## Grafana
+
+Grafana visualizes all collected metrics through dashboards.
+
+Example URL:
+
+https://grafana.artur-marbach.de
+
+The dashboard is secured using HTTPS certificates automatically issued by Let's Encrypt.
 ---
 
 # Validation
@@ -298,8 +402,11 @@ Infrastructure validation includes:
 - Idempotency testing
 - SSH connectivity verification
 - Firewall verification
-- Kubernetes service validation
 - Kubernetes node validation
+- Kubernetes service validation
+- DNS validation
+- HTTPS validation
+- TLS certificate validation
 
 ---
 
@@ -328,6 +435,18 @@ Infrastructure validation includes:
 - ✅ Cluster successfully deployed
 - ✅ Idempotency verified
 
+## Kubernetes
+
+- ✅ NGINX Deployment
+- ✅ ClusterIP Service
+- ✅ CoreDNS Validation
+- ✅ Internal Service Communication
+- ✅ Traefik Ingress
+- ✅ Public Domain
+- ✅ HTTPS enabled
+- ✅ cert-manager
+- ✅ Let's Encrypt
+
 ---
 
 # Roadmap
@@ -335,10 +454,10 @@ Infrastructure validation includes:
 - [x] Provision infrastructure with Terraform
 - [x] Configure servers with Ansible
 - [x] Deploy k3s cluster
-- [ ] Deploy sample applications
-- [ ] Configure Ingress
-- [ ] Install cert-manager
-- [ ] Configure Let's Encrypt
+- [x] Deploy sample application
+- [x] Configure Ingress
+- [x] Install cert-manager
+- [x] Configure Let's Encrypt
 - [ ] Deploy Prometheus
 - [ ] Deploy Grafana
 - [ ] Configure GitHub Actions
@@ -355,8 +474,12 @@ The focus is on:
 
 - Infrastructure as Code
 - Configuration Management
+- Linux Administration
 - Kubernetes Automation
+- Kubernetes Networking
+- Reverse Proxy (Traefik)
+- HTTPS Automation
+- TLS Certificate Management
+- DevOps Best Practices
 - Reproducibility
 - Scalability
-- Linux Administration
-- DevOps Best Practices
