@@ -36,6 +36,8 @@ Grafana provides dashboards for:
 - Traefik Requests
 - Deployment Health
 
+![Grafana Dashboard](../images/monitoring/grafana-dashboard.png)
+
 ## Alerting
 
 Grafana Alerting monitors critical infrastructure components.

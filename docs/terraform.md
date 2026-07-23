@@ -25,7 +25,7 @@ The infrastructure consists of one Kubernetes control plane and two worker nodes
 
 The following screenshot shows the provisioned infrastructure running on Hetzner Cloud.
 
-![Hetzner Infrastructure](images/terraform/hetzner-servers.png)
+![Hetzner Infrastructure](../images/terraform/hetzner-servers.png)
 
 ## Features
 

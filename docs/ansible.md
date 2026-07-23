@@ -1,7 +1,6 @@
 # Ansible
 
 Ansible configures every server after Terraform has finished provisioning the infrastructure.
-
 The configuration is fully automated and idempotent.
 
 ## Configuration
@@ -29,3 +28,9 @@ The playbook performs the following tasks:
 | k3s_agent | Join Worker Nodes |
 
 All roles are designed to be reusable and modular.
+
+## Playbook Run
+
+The following output shows a successful, idempotent run across all three hosts — no failures, no unreachable nodes.
+
+![Ansible Play Recap](../images/ansible/play-recap.png)
