@@ -1,0 +1,45 @@
+---
+- name: Set system hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Set timezone to Europe/Berlin
+  community.general.timezone:
+    name: Europe/Berlin
+
+- name: Install time synchronization and automatic update packages
+  ansible.builtin.apt:
+    name:
+      - chrony
+      - unattended-upgrades
+      - apt-listchanges
+    state: present
+    update_cache: true
+
+- name: Enable and start chrony
+  ansible.builtin.service:
+    name: chrony
+    state: started
+    enabled: true
+
+- name: Enable unattended upgrades
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Check whether a reboot is required
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+  register: reboot_required
+
+- name: Reboot server when required
+  ansible.builtin.reboot:
+    reboot_timeout: 600
+    connect_timeout: 10
+    post_reboot_delay: 15
+  when: reboot_required.stat.exists
