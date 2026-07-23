@@ -130,7 +130,6 @@ k3s-infrastructure/
 │   │   └── grafana-ingress.yaml
 │   │
 │   └── apps/
-│       ├── bookstore/
 │       └── da-bubble/
 │
 ├── scripts/
@@ -184,7 +183,6 @@ Configuration includes:
 Current deployed applications:
 
 - DaBubble
-- BookStore API
 
 Infrastructure components:
 
@@ -210,9 +208,6 @@ TLS certificates issued via cert-manager and Let's Encrypt:
 
 ![DaBubble Login](images/apps/dabubble-https-login.png)
 
-### BookStore API
-
-![BookStore API](images/apps/bookstore-swagger.png)
 
 ---
 
@@ -242,10 +237,6 @@ The monitoring stack is installed using the official **kube-prometheus-stack** H
 
 ![Grafana Dashboard](images/monitoring/grafana-dashboard.png)
 
-Prometheus targets, confirming all components are being scraped:
-
-![Prometheus Targets](images/monitoring/prometheus-targets.png)
-
 ---
 
 ## Alerting
@@ -257,7 +248,7 @@ Example alert:
 - Deployment replica count
 - Trigger when available replicas fall below the desired state
 
-![Grafana Alert](images/monitoring/grafana-alert.png)
+
 
 ---
 
