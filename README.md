@@ -1,36 +1,22 @@
 # k3s Infrastructure
 
-This repository contains a production-oriented Infrastructure as Code (IaC) project that provisions and configures a highly available Kubernetes (k3s) cluster on Hetzner Cloud using Terraform and Ansible.
+Production-ready Kubernetes infrastructure running on **Hetzner Cloud** using **Terraform**, **Ansible**, **k3s**, **Traefik**, **Helm**, **Prometheus**, and **Grafana**.
 
-The project demonstrates a complete infrastructure lifecycle:
-
-- Infrastructure provisioning with Terraform
-- Linux server configuration with Ansible
-- Kubernetes (k3s) cluster deployment
-- Infrastructure hardening
-- Traefik Ingress
-- Automatic TLS with cert-manager and Let's Encrypt
-- Infrastructure validation
-- Reproducible and scalable deployments
-
-Future extensions include monitoring, CI/CD, and automated application deployments.
+This project demonstrates a complete Infrastructure as Code (IaC) workflow, from provisioning Linux servers to deploying, securing, and monitoring Kubernetes applications.
 
 ---
 
 # Table of Contents
 
-- Quickstart
-- Infrastructure Overview
-- Architecture
-- Project Structure
-- Terraform
-- Ansible
-- Kubernetes
-- HTTPS & Ingress
-- Validation
-- Current Progress
-- Roadmap
-- Project Goals
+- [Quickstart](#quickstart)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Deployment](#deployment)
+- [Monitoring](#monitoring)
+- [Security](#security)
+- [Roadmap](#roadmap)
+- [Screenshots](#screenshots)
 
 ---
 
@@ -40,9 +26,13 @@ Future extensions include monitoring, CI/CD, and automated application deploymen
 
 - Terraform
 - Ansible
+- kubectl
+- Helm
 - Hetzner Cloud Account
 - SSH Key
-- Ubuntu/Linux Control Machine
+- Linux Control Machine
+
+---
 
 ## Clone Repository
 
@@ -53,20 +43,19 @@ cd k3s-infrastructure
 
 ---
 
-# Deploy Infrastructure
+## Provision Infrastructure
 
 ```bash
 cd terraform
 
 terraform init
-terraform validate
 terraform plan
 terraform apply
 ```
 
 ---
 
-# Configure Cluster
+## Configure Cluster
 
 ```bash
 cd ../ansible
@@ -76,67 +65,36 @@ ansible-playbook playbook.yml
 
 ---
 
-# Deploy Kubernetes Resources
+## Deploy Kubernetes Resources
 
 ```bash
-kubectl apply -f kubernetes/apps/nginx/
+kubectl apply -f kubernetes/
 ```
 
 ---
 
-# Infrastructure Overview
+# Features
 
-Current infrastructure:
-
-- Hetzner Cloud
-- Ubuntu Server 24.04
-- 1 Control Plane
-- 2 Worker Nodes
-- SSH Key Authentication
-- Terraform Provisioning
-- Ansible Configuration Management
-- Kubernetes (k3s)
+- Infrastructure provisioning with Terraform
+- Linux server automation using Ansible
+- Highly available k3s cluster
 - Traefik Ingress Controller
-- cert-manager
-- Let's Encrypt TLS Certificates
-- HTTPS-enabled Applications
+- Automatic HTTPS using cert-manager & Let's Encrypt
+- Helm-based monitoring stack
+- Prometheus metrics collection
+- Grafana dashboards
+- Grafana alerting
+- Infrastructure automation scripts
 
 ---
 
 # Architecture
 
-```text
-                      Internet
-                          │
-                          ▼
-             k3s.artur-marbach.de
-                          │
-                    DNS A Record
-                          │
-                          ▼
-            Traefik Ingress Controller
-                          │
-               HTTPS (Let's Encrypt)
-                          │
-                          ▼
-                 nginx-service (ClusterIP)
-                          │
-                ┌─────────┴─────────┐
-                │                   │
-          nginx Pod 1         nginx Pod 2
+> Architecture diagram coming soon.
 
-
-                 Kubernetes Cluster
-                        ▲
-                        │
-               Ansible Configuration
-                        ▲
-                        │
-             Terraform Infrastructure
-                        ▲
-                        │
-                  Hetzner Cloud
-```
+<!--
+Insert architecture diagram here.
+-->
 
 ---
 
@@ -147,9 +105,9 @@ k3s-infrastructure/
 
 ├── terraform/
 │   ├── main.tf
-│   ├── outputs.tf
 │   ├── provider.tf
 │   ├── variables.tf
+│   ├── outputs.tf
 │   ├── versions.tf
 │   └── terraform.tfvars.example
 │
@@ -158,255 +116,80 @@ k3s-infrastructure/
 │   ├── playbook.yml
 │   ├── ansible.cfg
 │   └── roles/
-│       ├── common/
-│       ├── users/
-│       ├── ssh_hardening/
-│       ├── system_config/
-│       ├── firewall/
-│       ├── k3s_prerequisites/
-│       ├── k3s_server/
-│       └── k3s_agent/
 │
 ├── kubernetes/
-│   ├── apps/
-│   │   └── nginx/
-│   │       ├── deployment.yaml
-│   │       ├── service.yaml
-│   │       └── ingress.yaml
+│   ├── infrastructure/
+│   │   ├── cert-manager/
+│   │   └── traefik/
 │   │
-│   └── cluster/
-│       └── cluster-issuer.yaml
+│   ├── monitoring/
+│   │   ├── values.yaml
+│   │   └── grafana-ingress.yaml
+│   │
+│   └── apps/
+│       ├── bookstore/
+│       └── da-bubble/
 │
-├── README.md
-└── .gitignore
+├── scripts/
+│
+└── README.md
 ```
 
 ---
 
-# Terraform
+# Deployment
+
+## Infrastructure
 
 Terraform provisions the complete infrastructure on Hetzner Cloud.
 
-## Features
+Provisioned servers:
 
-- Hetzner Cloud Provider
-- Reusable Variables
-- SSH Key Authentication
-- Infrastructure Outputs
-- for_each Infrastructure
-- Infrastructure as Code
-- State Refactoring using moved
-
-## Provisioned Servers
-
-| Server | Role | Operating System |
-|---------|------|------------------|
-| k3s-control-plane | Control Plane | Ubuntu 24.04 |
-| k3s-worker-1 | Worker | Ubuntu 24.04 |
-| k3s-worker-2 | Worker | Ubuntu 24.04 |
+| Server | Role |
+|---------|------|
+| Control Plane | Kubernetes Control Plane |
+| Worker 1 | Kubernetes Worker |
+| Worker 2 | Kubernetes Worker |
 
 ---
 
-# Ansible
+## Configuration Management
 
-After provisioning, Ansible configures every server automatically.
+Ansible configures all Linux servers automatically.
 
-## Roles
+Configuration includes:
 
-### common
-
-- Install required packages
-- Update package cache
-
-### users
-
-- Create administrator user
-- Configure SSH authorized_keys
-- Configure passwordless sudo
-
-### ssh_hardening
-
-- Disable root login
-- Disable password authentication
-- Enable public key authentication
-- Harden SSH configuration
-
-### system_config
-
-- Configure hostname
-- Configure timezone
-- Install Chrony
-- Configure unattended upgrades
-
-### firewall
-
-- Install UFW
-- Configure default policies
-- Allow SSH
-- Allow HTTP
-- Allow HTTPS
-- Allow Kubernetes API
-- Configure Kubernetes networking
-
-### k3s_prerequisites
-
-- Disable Swap
-- Configure Kernel Modules
-- Enable IP Forwarding
-- Configure sysctl
-- Prepare Linux for Kubernetes
-
-### k3s_server
-
-- Install k3s Control Plane
-- Configure kubeconfig
-- Read Join Token
-- Wait until Kubernetes API is ready
-
-### k3s_agent
-
-- Automatically join worker nodes
-- Configure k3s-agent service
+- Package installation
+- SSH hardening
+- Administrator user creation
+- Firewall configuration
+- Kubernetes prerequisites
+- k3s installation
+- Cluster bootstrap
+- Worker node joining
 
 ---
 
-# Automated Cluster Preparation
+## Kubernetes
 
-To reduce manual work and make the infrastructure reproducible, the cluster preparation process was automated using Bash scripts.
+Current deployed applications:
 
-Previously, several steps had to be performed manually after every Terraform deployment:
+- DaBubble
+- BookStore API
 
-- Copy the new server IP addresses
-- Update the Ansible inventory
-- Remove outdated SSH host keys
-- Wait until the new servers were reachable
-- Connect as `root`
-- Create the administrator user
-- Switch Ansible to the administrator user
-- Run the main Ansible playbook
-- Download and update the kubeconfig
-- Verify the Kubernetes cluster
+Infrastructure components:
 
-These steps are now handled automatically.
-
----
-
-## Automation Overview
-
-The automated workflow consists of several scripts:
-
-```text
-Terraform
-    │
-    ▼
-Create Hetzner Cloud servers
-    │
-    ▼
-generate-inventory.sh
-    │
-    ▼
-Create Ansible inventory from Terraform outputs
-    │
-    ▼
-prepare-cluster.sh
-    │
-    ├── Remove outdated SSH host keys
-    ├── Wait for SSH availability
-    ├── Test connection as administrator user
-    ├── Run bootstrap playbook if required
-    ├── Run the main Ansible playbook
-    └── Update local kubeconfig
-    │
-    ▼
-Ready k3s cluster
-
----
-
-
-# Kubernetes
-
-The Kubernetes cluster is deployed entirely through Ansible.
-
-## Cluster Topology
-
-- 1 Control Plane
-- 2 Worker Nodes
-
-## Deployed Resources
-
-- Kubernetes Deployment
-- ClusterIP Service
-- Traefik Ingress
-- cert-manager
-- Let's Encrypt Certificate
-- HTTPS-enabled Application
-- CoreDNS Service Discovery
-
-## Deploy Application
-
-```bash
-kubectl apply -f kubernetes/apps/nginx/
-```
-
-## Verify Deployment
-
-```bash
-kubectl get deployments
-kubectl get pods -o wide
-kubectl get services
-kubectl get ingress
-```
-
-## Validate DNS Resolution
-
-```bash
-kubectl run dns-test \
-  --image=busybox:1.36 \
-  --rm -it \
-  --restart=Never \
-  -- nslookup nginx-service.default.svc.cluster.local
-```
-
-## Validate Service Connectivity
-
-```bash
-kubectl run curl-test \
-  --image=curlimages/curl \
-  --rm -it \
-  --restart=Never \
-  -- curl http://nginx-service
-```
-
----
-
-# HTTPS & Ingress
-
-Applications are exposed through Traefik Ingress using a public domain.
-
-Current configuration:
-
-- Domain-based routing
-- Traefik Ingress Controller
-- Automatic TLS provisioning
+- Traefik
 - cert-manager
 - Let's Encrypt
-- HTTPS
-
-Example:
-
-```
-https://k3s.artur-marbach.de
-```
-
-The TLS certificate is automatically issued and renewed by cert-manager using Let's Encrypt.
+- Prometheus
+- Grafana
 
 ---
 
 # Monitoring
 
-Cluster monitoring is implemented using the official kube-prometheus-stack Helm chart.
-
-The monitoring stack provides real-time visibility into the Kubernetes cluster, worker nodes, and deployed workloads.
+The monitoring stack is installed using the official **kube-prometheus-stack** Helm chart.
 
 ## Components
 
@@ -415,124 +198,118 @@ The monitoring stack provides real-time visibility into the Kubernetes cluster, 
 - kube-state-metrics
 - Node Exporter
 
-## Collected Metrics
-
-Infrastructure metrics include:
-
-- CPU Usage
-- Memory Usage
-- Disk Usage
-- Network Traffic
-- Node Health
-
-Kubernetes metrics include:
-
-- Pod Status
-- Deployments
-- ReplicaSets
-- StatefulSets
-- DaemonSets
-- Container Restarts
-- Resource Requests & Limits
-
-## Grafana
-
-Grafana visualizes all collected metrics through dashboards.
-
-Example URL:
-
-https://grafana.artur-marbach.de
-
-The dashboard is secured using HTTPS certificates automatically issued by Let's Encrypt.
 ---
 
-# Validation
+## Dashboard Features
 
-Infrastructure validation includes:
-
-- Terraform validation
-- Ansible syntax validation
-- Idempotency testing
-- SSH connectivity verification
-- Firewall verification
-- Kubernetes node validation
-- Kubernetes service validation
-- DNS validation
-- HTTPS validation
-- TLS certificate validation
+- Node CPU Usage
+- Node Memory Usage
+- Pod Monitoring
+- Deployment Monitoring
+- HTTP Request Metrics
+- Container Resource Usage
+- Pod Restarts
+- Custom Grafana Dashboards
 
 ---
 
-# Current Progress
+## Alerting
 
-## Terraform
+Grafana Alerting is configured to monitor application health.
 
-- ✅ Terraform initialized
-- ✅ Hetzner provider configured
-- ✅ Variables created
-- ✅ SSH Keys configured
-- ✅ Control Plane provisioned
-- ✅ Worker Nodes provisioned
-- ✅ Infrastructure refactored using for_each
+Example alert:
 
-## Ansible
+- Deployment replica count
+- Trigger when available replicas fall below the desired state
 
-- ✅ Common role
-- ✅ Users role
-- ✅ SSH Hardening
-- ✅ System Configuration
-- ✅ Firewall Configuration
-- ✅ Kubernetes Prerequisites
-- ✅ k3s Server Deployment
-- ✅ k3s Worker Deployment
-- ✅ Cluster successfully deployed
-- ✅ Idempotency verified
+---
 
-## Kubernetes
+# Security
 
-- ✅ NGINX Deployment
-- ✅ ClusterIP Service
-- ✅ CoreDNS Validation
-- ✅ Internal Service Communication
-- ✅ Traefik Ingress
-- ✅ Public Domain
-- ✅ HTTPS enabled
-- ✅ cert-manager
-- ✅ Let's Encrypt
+Security best practices implemented:
+
+- SSH Key Authentication
+- Root Login Disabled
+- Password Authentication Disabled
+- UFW Firewall
+- Automatic HTTPS
+- Let's Encrypt Certificates
+- Automatic Certificate Renewal
 
 ---
 
 # Roadmap
 
-- [x] Provision infrastructure with Terraform
-- [x] Configure servers with Ansible
-- [x] Deploy k3s cluster
-- [x] Deploy sample application
-- [x] Configure Ingress
-- [x] Install cert-manager
-- [x] Configure Let's Encrypt
-- [ ] Deploy Prometheus
-- [ ] Deploy Grafana
-- [ ] Configure GitHub Actions
-- [ ] Continuous Deployment
-- [ ] Monitoring Dashboards
+- [x] Terraform Infrastructure
+- [x] Ansible Automation
+- [x] k3s Cluster
+- [x] Traefik Ingress
+- [x] cert-manager
+- [x] Let's Encrypt
+- [x] Helm
+- [x] Prometheus
+- [x] Grafana
+- [x] Grafana Alerting
+- [ ] GitHub Actions CI/CD
+- [ ] GitOps with ArgoCD
 
 ---
 
-# Project Goals
+# Screenshots
 
-This project demonstrates modern Infrastructure as Code principles by combining Terraform, Ansible, and Kubernetes into a reproducible and scalable deployment workflow.
+## Architecture
 
-The focus is on:
+*Coming soon*
 
-- Infrastructure as Code
-- Configuration Management
-- Linux Administration
-- Kubernetes Automation
-- Kubernetes Networking
-- Reverse Proxy (Traefik)
-- HTTPS Automation
-- TLS Certificate Management
-- DevOps Best Practices
-- Reproducibility
-- Scalability
+---
+
+## Kubernetes Cluster
+
+*Coming soon*
+
+---
+
+## DaBubble
+
+*Coming soon*
+
+---
+
+## BookStore API
+
+*Coming soon*
+
+---
+
+## Grafana Dashboard
+
+*Coming soon*
+
+---
+
+## Grafana Alert
+
+*Coming soon*
+
+---
+
+# Technologies
+
+| Category | Technology |
+|----------|------------|
+| Cloud | Hetzner Cloud |
+| Infrastructure as Code | Terraform |
+| Configuration Management | Ansible |
+| Container Orchestration | Kubernetes (k3s) |
+| Containers | Docker |
+| Ingress | Traefik |
+| Certificate Management | cert-manager |
+| Monitoring | Prometheus |
+| Dashboards | Grafana |
+| Package Management | Helm |
+
+---
+
+# License
+
+This project is intended for educational and portfolio purposes.
