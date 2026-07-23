@@ -11,7 +11,7 @@ The cluster consists of:
 
 The control plane manages the cluster, while workloads are scheduled across the worker nodes.
 
-![Cluster Nodes](images/kubernetes/kubectl-get-nodes.png)
+![Cluster Nodes](../images/kubernetes/kubectl-get-nodes.png)
 
 ## Platform Components
 
@@ -24,7 +24,7 @@ The following platform components are deployed:
 - Prometheus
 - Grafana
 
-![All Pods](images/kubernetes/kubectl-get-pods-all.png)
+![All Pods](../images/kubernetes/kubectl-get-pods-all.png)
 
 ## Deployed Applications
 
@@ -34,7 +34,7 @@ The cluster currently hosts the following applications:
 
 The application is exposed through Traefik using HTTPS certificates issued by Let's Encrypt.
 
-![DaBubble Login](images/apps/dabubble-https-login.png)
+![DaBubble Login](../images/apps/dabubble-https-login.png)
 
 ## Networking
 
@@ -56,6 +56,6 @@ ClusterIP Service
 Application Pods
 ```
 
-![Ingress Overview](images/kubernetes/kubectl-get-ingress-all.png)
+![Ingress Overview](../images/kubernetes/kubectl-get-ingress-all.png)
 
 This architecture enables multiple applications to share a single public IP address while remaining isolated within the Kubernetes cluster.
