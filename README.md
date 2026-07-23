@@ -1,26 +1,23 @@
 # k3s Infrastructure
 
-Production-ready Kubernetes infrastructure running on **Hetzner Cloud** using **Terraform**, **Ansible**, **k3s**, **Traefik**, **Helm**, **Prometheus**, and **Grafana**.
+Infrastructure as Code (IaC) project showcasing the automated provisioning, configuration, deployment and monitoring of a Kubernetes cluster on **Hetzner Cloud** using **Terraform**, **Ansible**, **k3s**, **Traefik**, **Helm**, **Prometheus**, and **Grafana**.
 
-This project demonstrates a complete Infrastructure as Code (IaC) workflow, from provisioning Linux servers to deploying, securing, and monitoring Kubernetes applications.
-
+The focus of this repository is infrastructure automation, Linux administration and Kubernetes operations rather than application development.
 ---
 
 # Table of Contents
 
-- [Quickstart](#quickstart)
+- [Deployment Overview](#deployment-overview)
 - [Features](#features)
 - [Architecture](#architecture)
 - [Project Structure](#project-structure)
 - [Deployment](#deployment)
 - [Monitoring](#monitoring)
 - [Security](#security)
-- [Roadmap](#roadmap)
-- [Screenshots](#screenshots)
 
 ---
 
-# Quickstart
+# Deployment Overview
 
 ## Prerequisites
 
@@ -73,24 +70,30 @@ kubectl apply -f kubernetes/
 
 ---
 
-# Features
+## Features
 
+### Infrastructure
 - Infrastructure provisioning with Terraform
 - Linux server automation using Ansible
-- Highly available k3s cluster
+- Multi-node k3s cluster
+
+### Networking
 - Traefik Ingress Controller
 - Automatic HTTPS using cert-manager & Let's Encrypt
-- Helm-based monitoring stack
+
+### Observability
 - Prometheus metrics collection
 - Grafana dashboards
 - Grafana alerting
+
+### Automation
 - Infrastructure automation scripts
 
 ---
 
 # Architecture
 
-> Architecture diagram coming soon.
+![Architecture Diagram](images/architecture/architecture-diagram.png)
 
 <!--
 Insert architecture diagram here.
@@ -145,11 +148,17 @@ Terraform provisions the complete infrastructure on Hetzner Cloud.
 
 Provisioned servers:
 
+![Hetzner Cloud Servers](images/terraform/hetzner-servers.png)
+
 | Server | Role |
 |---------|------|
 | Control Plane | Kubernetes Control Plane |
 | Worker 1 | Kubernetes Worker |
 | Worker 2 | Kubernetes Worker |
+
+Cluster nodes as seen from Kubernetes:
+
+![Cluster Nodes](images/kubernetes/kubectl-get-nodes.png)
 
 ---
 
@@ -185,6 +194,26 @@ Infrastructure components:
 - Prometheus
 - Grafana
 
+All pods running across the cluster:
+
+![All Pods](images/kubernetes/kubectl-get-pods-all.png)
+
+Ingress routes exposing applications through Traefik:
+
+![Ingress Overview](images/kubernetes/kubectl-get-ingress-all.png)
+
+TLS certificates issued via cert-manager and Let's Encrypt:
+
+![Certificates](images/kubernetes/kubectl-get-certificates-all.png)
+
+### DaBubble
+
+![DaBubble Login](images/apps/dabubble-https-login.png)
+
+### BookStore API
+
+![BookStore API](images/apps/bookstore-swagger.png)
+
 ---
 
 # Monitoring
@@ -211,6 +240,12 @@ The monitoring stack is installed using the official **kube-prometheus-stack** H
 - Pod Restarts
 - Custom Grafana Dashboards
 
+![Grafana Dashboard](images/monitoring/grafana-dashboard.png)
+
+Prometheus targets, confirming all components are being scraped:
+
+![Prometheus Targets](images/monitoring/prometheus-targets.png)
+
 ---
 
 ## Alerting
@@ -221,6 +256,8 @@ Example alert:
 
 - Deployment replica count
 - Trigger when available replicas fall below the desired state
+
+![Grafana Alert](images/monitoring/grafana-alert.png)
 
 ---
 
@@ -235,61 +272,6 @@ Security best practices implemented:
 - Automatic HTTPS
 - Let's Encrypt Certificates
 - Automatic Certificate Renewal
-
----
-
-# Roadmap
-
-- [x] Terraform Infrastructure
-- [x] Ansible Automation
-- [x] k3s Cluster
-- [x] Traefik Ingress
-- [x] cert-manager
-- [x] Let's Encrypt
-- [x] Helm
-- [x] Prometheus
-- [x] Grafana
-- [x] Grafana Alerting
-- [ ] GitHub Actions CI/CD
-- [ ] GitOps with ArgoCD
-
----
-
-# Screenshots
-
-## Architecture
-
-*Coming soon*
-
----
-
-## Kubernetes Cluster
-
-*Coming soon*
-
----
-
-## DaBubble
-
-*Coming soon*
-
----
-
-## BookStore API
-
-*Coming soon*
-
----
-
-## Grafana Dashboard
-
-*Coming soon*
-
----
-
-## Grafana Alert
-
-*Coming soon*
 
 ---
 
