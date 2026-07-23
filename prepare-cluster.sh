@@ -6,6 +6,11 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ANSIBLE_DIR="$PROJECT_DIR/ansible"
 INVENTORY_FILE="$ANSIBLE_DIR/inventory.ini"
 
+export ANSIBLE_CONFIG="$ANSIBLE_DIR/ansible.cfg"
+
+mkdir -p "$HOME/.ansible/cp"
+rm -f "$HOME/.ansible/cp/"*
+
 echo "========================================"
 echo "1. Ansible-Inventory aktualisieren"
 echo "========================================"
