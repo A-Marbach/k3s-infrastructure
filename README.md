@@ -93,7 +93,7 @@ kubectl apply -f kubernetes/
 
 # Architecture
 
-![Architecture Diagram](../images/architect-diagramm/architecture-diagram.svg)
+![Architecture Diagram](images/architect-diagramm/architecture-diagram.svg)
 
 <!--
 Insert architecture diagram here.
