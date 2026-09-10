@@ -1,8 +1,9 @@
 # k3s Infrastructure
 
-Infrastructure as Code (IaC) project showcasing the automated provisioning, configuration, deployment and monitoring of a Kubernetes cluster on **Hetzner Cloud** using **Terraform**, **Ansible**, **k3s**, **Traefik**, **Helm**, **Prometheus**, and **Grafana**.
+Automated provisioning and operation of a multi-node k3s cluster on Hetzner Cloud using Terraform and Ansible.
 
-The focus of this repository is infrastructure automation, Linux administration and Kubernetes operations rather than application development.
+This project demonstrates Linux server administration, infrastructure automation, Kubernetes operations, networking, monitoring and TLS management.
+
 ---
 
 # Table of Contents
@@ -14,6 +15,8 @@ The focus of this repository is infrastructure automation, Linux administration 
 - [Deployment](#deployment)
 - [Monitoring](#monitoring)
 - [Security](#security)
+- [Technologies](#technologies)
+- [Skills Demonstrated](#skills-demonstrated)
 
 ---
 
@@ -21,13 +24,13 @@ The focus of this repository is infrastructure automation, Linux administration 
 
 ## Prerequisites
 
+- Linux
 - Terraform
 - Ansible
 - kubectl
 - Helm
-- Hetzner Cloud Account
-- SSH Key
-- Linux Control Machine
+- Hetzner Cloud account
+- SSH key
 
 ---
 
@@ -73,13 +76,13 @@ kubectl apply -f kubernetes/
 ## Features
 
 ### Infrastructure
-- Infrastructure provisioning with Terraform
-- Linux server automation using Ansible
-- Multi-node k3s cluster
+- Hetzner Cloud infrastructure provisioning with Terraform
+- Automated Linux server configuration with Ansible
+- Multi-node k3s cluster with one control plane and two worker nodes
 
 ### Networking
 - Traefik Ingress Controller
-- Automatic HTTPS using cert-manager & Let's Encrypt
+- TLS certificate management with cert-manager and Let's Encrypt
 
 ### Observability
 - Prometheus metrics collection
@@ -87,17 +90,13 @@ kubectl apply -f kubernetes/
 - Grafana alerting
 
 ### Automation
-- Infrastructure automation scripts
+- Infrastructure and cluster automation with Terraform, Ansible and shell scripts
 
 ---
 
 # Architecture
 
 ![Architecture Diagram](images/architect-diagramm/architecture-diagram.svg)
-
-<!--
-Insert architecture diagram here.
--->
 
 ---
 
@@ -106,7 +105,7 @@ Insert architecture diagram here.
 ```text
 k3s-infrastructure/
 
-├── terraform/
+├── terraform/              # Hetzner Cloud infrastructure
 │   ├── main.tf
 │   ├── provider.tf
 │   ├── variables.tf
@@ -114,13 +113,13 @@ k3s-infrastructure/
 │   ├── versions.tf
 │   └── terraform.tfvars.example
 │
-├── ansible/
+├── ansible/                # Linux server and k3s configuration
 │   ├── inventory.ini
 │   ├── playbook.yml
 │   ├── ansible.cfg
 │   └── roles/
 │
-├── kubernetes/
+├── kubernetes/             # Cluster resources
 │   ├── infrastructure/
 │   │   ├── cert-manager/
 │   │   └── traefik/
@@ -132,7 +131,7 @@ k3s-infrastructure/
 │   └── apps/
 │       └── da-bubble/
 │
-├── scripts/
+├── scripts/                # Automation scripts
 │
 └── README.md
 ```
@@ -143,17 +142,17 @@ k3s-infrastructure/
 
 ## Infrastructure
 
-Terraform provisions the complete infrastructure on Hetzner Cloud.
+Terraform provisions the Hetzner Cloud infrastructure for the k3s cluster.
 
 Provisioned servers:
 
 ![Hetzner Cloud Servers](images/terraform/hetzner-servers.png)
 
-| Server | Role |
-|---------|------|
+| Server        | Role                     |
+|---------------|--------------------------|
 | Control Plane | Kubernetes Control Plane |
-| Worker 1 | Kubernetes Worker |
-| Worker 2 | Kubernetes Worker |
+| Worker 1      | Kubernetes Worker        |
+| Worker 2      | Kubernetes Worker        |
 
 Cluster nodes as seen from Kubernetes:
 
@@ -163,7 +162,7 @@ Cluster nodes as seen from Kubernetes:
 
 ## Configuration Management
 
-Ansible configures all Linux servers automatically.
+Ansible configures the Linux servers and prepares them for k3s cluster operation.
 
 Configuration includes:
 
@@ -180,7 +179,9 @@ Configuration includes:
 
 ## Kubernetes
 
-Current deployed applications:
+The k3s cluster runs application workloads and infrastructure components for networking, TLS and monitoring.
+
+Current deployed application:
 
 - DaBubble
 
@@ -213,7 +214,7 @@ TLS certificates issued via cert-manager and Let's Encrypt:
 
 # Monitoring
 
-The monitoring stack is installed using the official **kube-prometheus-stack** Helm chart.
+The monitoring stack is installed using the official **kube-prometheus-stack** Helm chart and provides visibility into cluster, node, pod and workload health.
 
 ## Components
 
@@ -241,48 +242,65 @@ The monitoring stack is installed using the official **kube-prometheus-stack** H
 
 ## Alerting
 
-Grafana Alerting is configured to monitor application health.
+Grafana Alerting is used to monitor workload availability.
 
-Example alert:
+Example alert condition:
 
-- Deployment replica count
-- Trigger when available replicas fall below the desired state
-
-
+- Monitor available deployment replicas
+- Trigger an alert when available replicas fall below the desired replica count
 
 ---
 
 # Security
 
-Security best practices implemented:
+Security measures implemented across the Linux servers and cluster include:
 
-- SSH Key Authentication
-- Root Login Disabled
-- Password Authentication Disabled
-- UFW Firewall
-- Automatic HTTPS
-- Let's Encrypt Certificates
-- Automatic Certificate Renewal
+- SSH key authentication
+- Root login disabled
+- Password authentication disabled
+- UFW firewall configuration
+- HTTPS with Let's Encrypt
+- TLS certificate management with cert-manager
+- Automatic certificate renewal
 
 ---
 
 # Technologies
 
-| Category | Technology |
-|----------|------------|
-| Cloud | Hetzner Cloud |
-| Infrastructure as Code | Terraform |
-| Configuration Management | Ansible |
-| Container Orchestration | Kubernetes (k3s) |
-| Containers | Docker |
-| Ingress | Traefik |
-| Certificate Management | cert-manager |
-| Monitoring | Prometheus |
-| Dashboards | Grafana |
-| Package Management | Helm |
+| Category                | Technology      |
+|-------------------------|-----------------|
+| Operating System        | Linux           |
+| Cloud                   | Hetzner Cloud   |
+| Infrastructure as Code  | Terraform       |
+| Configuration Management| Ansible         |
+| Container Orchestration | Kubernetes (k3s)|
+| Containers              | Docker          |
+| Ingress                 | Traefik         |
+| Certificate Management  | cert-manager    |
+| Monitoring              | Prometheus      |
+| Dashboards              | Grafana         |
+| Package Management      | Helm            |
 
 ---
+
+# Skills Demonstrated
+
+- Linux Server Administration
+- Infrastructure as Code with Terraform
+- Configuration Management with Ansible
+- Kubernetes Operations with k3s
+- Cluster Networking with Traefik
+- TLS Certificate Management with cert-manager
+- Prometheus Monitoring
+- Grafana Dashboards and Alerting
+- SSH Hardening and Firewall Configuration
+- Multi-node Cluster Provisioning
+- Infrastructure Troubleshooting
+
+--- 
 
 # License
 
 This project is intended for educational and portfolio purposes.
+
+
